@@ -3,7 +3,7 @@ How to use Auto-Config with the 64-bit ROMs
 2. [Flash 64-bit ROM on device](#flash-64-bit-rom-on-device)
 3. [Prepare device for auto-config](#prepare-device-for-auto-config)
 4. [Accept device in MADmin](#accept-device-in-mad)
-5. [Troubleshooting](#troublehooting)
+5. [Troubleshooting](#troubleshooting)
 
 ## Configure MAD to prepare for auto-configuring devices
  - **System -> MADmin Packages -> Click Wizard Hat (Update Everything)**
@@ -23,7 +23,7 @@ How to use Auto-Config with the 64-bit ROMs
    - set Websocket URI
    - set Basic Authentication
  - **Apply Settings!**
- - **System -> Auto-Config**, click **Download Configuration*
+ - **System -> Auto-Config**, click **Download Configuration**
    - This file will only have two lines in it:
      - Your PogoDroid *Post Destination*
      - Your basic auth *user:password*
@@ -43,7 +43,7 @@ How to use Auto-Config with the 64-bit ROMs
    - On the A95X F1 and the X96 Mini the reset button is inside the AV port
  - Connect device<sup>2</sup> to computer with a USB-A to USB-A cable
  - Connect power cable to ATV
- - When burning is 100% done, disconnect the USB cable from the device
+ - When burning is 100% done, disconnect the USB and power cables from the device
    - (Connect the next device if you are flashing more than one)
  - Click Stop
  - Close burning tool
@@ -52,15 +52,16 @@ How to use Auto-Config with the 64-bit ROMs
 
 <sup>2</sup> Recommended USB ports for flashing (use other if first doesn't work):
  - On TX9S, flash with the USB port closest to the network port
- - On X96 Mini use left USB port (recommended on Discord)
- - On A95X F1 use right USB port (recommended on Discord)
+ - On X96 Mini use USB port farther away from SD-card slot
+ - On A95X F1 use USB port closest to power connection
 
 ## Prepare device for auto-config
 See optional network config [steps](#manual-network-configuration) if you need to set a Static IP on the ATV.
 
- - Plug FAT formatted USB drive with the mad_autoconf.txt file into appropriate USB port
+ - Plug FAT32 formatted USB drive with the mad_autoconf.txt file into appropriate USB port
    - On the TX9S use the USB port farthest away from network port
-   - On A95X F1 use the right USB port
+   - On A95X F1 use USB port closest/next to SD-card slot
+   - On X96 Mini use USB port closest/next to SD-card slot
  - Plug network cable into the device
  - Plug power into device (usb-to-barrel, or power brick-to-barrel)
  - If the device contacted your MAD server successfully, it will not do anything until you [Accept the device in MAD](#accept-device-in-mad)
@@ -82,7 +83,7 @@ This option is advanced and is not recommended and is not likely to be supported
  - Select the "Network" option
  - Select the "IP settings" option
  - Select the "Static" option
- - Enter manual ip address info
+ - Enter manual IP address info
  - Once that is saved, you can press escape to get back to the app tray
  - Disconnect the keyboard and plug the USB drive into the USB port for that device
  - Continue with [Prepare device for auto-config](#prepare-device-for-auto-config)
@@ -93,30 +94,49 @@ This option is advanced and is not recommended and is not likely to be supported
  - Click the IP-address of the pending device, then assign it an origin
    - Do not just click accept, if you do then MAD will create a new origin named madromxyz and assign it to the device
  - Once an origin is assigned the device will start downloading files and configuring its settings
-   - You can watch its progress by clicking on the View Device logs on the Pending Devices page
+   - You can watch its progress by clicking on the View Session logs on the Pending Devices page
 
 ## Troubleshooting
 
 ### Problems flashing image onto device
-The flashing tool is known to be tempremental. Some steps you can try include:
+The flashing tool is known to be temperamental. Some steps you can try include:
 
  - Make sure you are using a high quality short USB-A to USB-A cable
    - See beavis's [PimpMyAtv wiki](https://github.com/madBeavis/PimpMyAtv/wiki/Cabling) for good options
  - Try to use a different USB port on the device
  - Try to use a different USB port on the computer
+ - Reboot Windows, those USB drivers are funky
  - Sometimes there are flashing problems with USB3 ports, try to use a USB2 port
  - Sometimes there are flashing problems from computers with an AMD processor, try flashing from a computer with an Intel processor
  - Sometimes you need to plug in power to the device at the same time you plugin in the USB cable
-   - This is usally to correct low power warnings
+   - This is usually to correct low power warnings
 
 ### Device not showing up in MADmin -> System -> Auto-Config -> Pending Devices
 
-If at this point it has never showed up in MADmin and goes direct to flashing things in TWRP,
-then you have a problem with it reading the autoconfig file from your USB drive.
-You can try using the other USB port, be sure it is FAT formatted, no windows line endings.
+If at this point it has never showed up in MADmin, then there are two likely problems.
+Either it had a problem reading the autoconfig file from your USB drive and it goes direct to flashing things in TWRP,
+or it read the autoconfig file from the USB drive but it has a problem accessing your MAD server due to incorrect settings or network issues.
+
+To find out what errors or problems your device is encountering, or just to see the status of 42mad
+configuring your device, you can adb into your device and check the `/data/local/madromlogs/42mad.log` log
+file.
+
+To view the log remotely on the device:
+ - `adb connect <ip>`
+ - `adb shell`
+ - `su`
+ - `cat /data/local/madromlogs/42mad.log`
+
+Or to bring the file locally (and save it to `/tmp/42mad.log`):
+ - `adb connect <ip>`
+ - `adb pull /data/local/madromlogs/42mad.log /tmp/42mad.log`
+
+For problems reading the USB drive you can try using the other USB port,
+make sure the drive is FAT formatted, and that the mad_autoconf.txt file has no Windows line endings.
 
 To verify the device can access the USB drive:
  - `adb connect <ip>`
+ - `adb shell`
  - `su`
  - `ls -la /mnt/media_rw/`
  
@@ -125,6 +145,7 @@ If you see only two lines like:
 drwxr-x---  2 root media_rw  40 1970-01-01 00:00 .
 drwxr-xr-x 10 root system   220 1970-01-01 00:00 ..
 ```
+
 That means the device hasn't recognized the USB drive, try the other USB port on the device.
 You should see a result like:
 ```
