@@ -46,7 +46,7 @@ fi
 #lets check for updates
 execute_autoupdates(){
 if ! grep -q "version $uver" /system/bin/update_mad.sh; then
-    download https://raw.githubusercontent.com/Map-A-Droid/MAD-ATV/master/update_mad.sh /system/bin/update_mad.sh
+    download https://raw.githubusercontent.com/ColdShadow80/MAD-ATV/fd8784752dbcef2f685b6b0ccb0249e1dae0a2fe/update_mad.sh /system/bin/update_mad.sh
     chmod +x /system/bin/update_mad.sh
 fi
 if ! grep -q "version $pver" /system/bin/pingreboot.sh; then
